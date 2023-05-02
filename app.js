@@ -1,8 +1,18 @@
-function GameBoard(player1, player2) {
-    this.player1 = player1;
-    this.player2 = player2;
-    gameBoard = [null, null, null, null, null, null, null, null, null, ]
+function Player(player, choice) {
+    this.player = player;
+    this.choice = choice;
   }
+
+  function GameBoard(){
+  gameBoard = [null, null, null, null, null, null, null, null, null, ]
+  }
+
+
+
+const humanPlayer = new Player('Human', 'X');
+const computerPlayer = new Player('Computer', 'O');
+const gameBoard = new GameBoard(humanPlayer, computerPlayer);
+
 
 let playerChoice = ''
 
