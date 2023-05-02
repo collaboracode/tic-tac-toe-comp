@@ -2,16 +2,19 @@ function Player(player, choice) {
     this.player = player;
     this.choice = choice;
   }
+  const gameBoard = ['X', 'O','X', 'O', 'X', 'O', 'X', 'O', 'X']
 
-  function GameBoard(){
-  gameBoard = [null, null, null, null, null, null, null, null, null, ]
+  const board = document.querySelector('.board')
+
+  function renderBoard(gameBoard){
+    const cells = document.querySelectorAll('.cell')
+    cells.forEach((cell, index) => {
+        cell.textContent = gameBoard[index]
+    })
   }
-
-
 
 const humanPlayer = new Player('Human', 'X');
 const computerPlayer = new Player('Computer', 'O');
-const gameBoard = new GameBoard(humanPlayer, computerPlayer);
 
 
 let playerChoice = ''
@@ -26,3 +29,6 @@ let playerChoice = ''
     playerChoice = choiceO.value
     choiceX.setAttribute('disabled', 'true')
  })
+
+
+ renderBoard(gameBoard)
