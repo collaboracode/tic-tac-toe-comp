@@ -180,7 +180,7 @@ function computerMove() {
       cells.forEach(cell => cell.setAttribute('disabled', true));
       return
     } 
-}
+
 
 function checkForWinner() {
   // for(let combo of winningCombos){
