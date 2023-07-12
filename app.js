@@ -3,6 +3,14 @@
 // Work on computer logic based on difficulty
 // Status message on Game End
 
+const difficultyEnum = {
+  easy: 0,
+  medium: 1,
+  hard: 2
+};
+
+Object.freeze(difficultyEnum);
+
 let gameActive = false;
 let gameWon = false;
 let playerChoice = ''
@@ -13,6 +21,8 @@ const gameBoard = ['', '', '', '', '', '', '', '', ''];
 const board = document.querySelector('.board')
 const cells = document.querySelectorAll('.cell')
 let gameStatus = document.querySelector('.game--status')
+let difficulty = 0;
+
 
 const winningCombos = [
   [0, 1, 2],
@@ -51,6 +61,60 @@ choiceO.addEventListener('click', (e) => {
    toggleAllCells(false);
    choiceX.setAttribute('disabled', 'true')
 })
+
+
+let easyMode = document.getElementById('easy')
+let mediumMode = document.getElementById('medium')
+let hardMode = document.getElementById('hard')
+
+// easyMode.addEventListener('click', () => {
+  
+//   mediumMode.disabled = true
+//   hardMode.disabled = true
+// })
+
+easyMode.addEventListener('click', function() {
+  difficulty = difficultyEnum[this.id];
+  mediumMode.disabled = true
+  hardMode.disabled = true
+})
+
+mediumMode.addEventListener('click', function() {
+  difficulty = difficultyEnum[this.id];
+  easyMode.disabled = true
+  hardMode.disabled = true
+})
+
+hardMode.addEventListener('click', function() {
+  difficulty = difficultyEnum[this.id];
+  mediumMode.disabled = true
+  easyMode.disabled = true
+})
+
+// const diffcultyContainer = document.getElementsByClassName('difficulty');
+
+// diffcultyContainer.children().forEach(diffButton => {
+//   diffButton.addEventListener('click', () => {
+//     const diffButtonId = diffButton.id;
+
+//     switch (diffButtonId) {
+//       case 'easy':
+//         document.getElementById('medium').disabled = true;
+//         document.getElementById('hard').disabled = true;
+//         break;
+//       case 'medium':
+//         document.getElementById('easy').disabled = true;
+//         document.getElementById('hard').disabled = true;
+//         break;
+//       case 'hard':
+//         document.getElementById('medium').disabled = true;
+//         document.getElementById('easy').disabled = true;
+
+//         break;
+//     }
+//   });
+// });
+
 
 // class Coach {
 //   constructor(player, coach){
@@ -137,14 +201,36 @@ function toggleAllCells(disable = true) {
 function computerMove() {
   if (!playerTurn) {
       // CURRENT LOGIC IS EASY MODE (RANDOM)
-      // Medium Difficulty - 1 Block
-      // Hard Difficulty - ALWAYS block
+      
+      
       //a variable that returns a random number from 0 to 8
     // let index = Math.floor(Math.random() * 8)
     //   //if the generated number lands on a cell in the array that is defined
     // while(gameBoard[index] != undefined){
     //   //then it generates another random num
     //     index = Math.floor(Math.random() * 8)
+
+    switch (difficulty) {
+      case difficultyEnum.easy:
+        let randomIndex = Math.floor(Math.random() * 8);
+
+        if (!gameBoard[randomIndex]) {
+          gameBoard[randomIndex] = computerChoice;
+          // TODO - mark spot in HTML side
+          if (!checkForWinner()) {
+            playerTurn = true;
+          }
+        } else {
+          computerMove();
+        }
+        break;
+      case difficultyEnum.medium:
+        // Medium Difficulty - 1 Block
+        break;
+      case difficultyEnum.hard:
+        // Hard Difficulty - ALWAYS block
+        break;
+    }
 
   }
 }
@@ -178,7 +264,7 @@ function computerMove() {
   if (gameBoard.every(cell => cell !== undefined)) {
     //all cells are filled, prevent any further moves
       cells.forEach(cell => cell.setAttribute('disabled', true));
-      return
+      // return
     } 
 
 
@@ -210,7 +296,7 @@ function checkForWinner() {
       if (roundWon) {
         gameStatus.innerHTML = winningMessage()
         gameActive = false
-        return
+        return true;
       }
 
       let roundDraw = !gameBoard.includes('')
@@ -218,7 +304,7 @@ function checkForWinner() {
       if (roundDraw) {
         gameStatus.innerHTML = drawMessage
         gameActive = false
-        return
+        return true;
       }
     }
 
