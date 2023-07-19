@@ -17,7 +17,11 @@ let playerChoice = ''
 let computerChoice = ''
 let playerTurn = true;
 // const gameBoard = Array.from({length: 9}); // initialize with undefined values
-const gameBoard = ['', '', '', '', '', '', '', '', ''];
+const gameBoard = [
+                    '', '', '',
+                    '', '', '',
+                    '', '', ''
+                  ];
 const board = document.querySelector('.board')
 const cells = document.querySelectorAll('.cell')
 let gameStatus = document.querySelector('.game--status')
@@ -187,19 +191,24 @@ function toggleAllCells(disable = true) {
  cells.forEach((cell, index) => {
 
   cell.addEventListener('click', (e) => {
-    gameBoard[index] = playerChoice
-    
-    renderBoard()
-    checkForWinner()
-    playerTurn = !playerTurn;
-    // computerMove()
+    if (gameActive) {
+      gameBoard[index] = playerChoice
+
+      playerTurn = true;
+
+      renderBoard()
+
+      if (!checkForWinner()) {
+        computerMove()
+      }
+    }
   });
 
   if (!gameActive) cell.setAttribute('disabled', true);
  });
  
 function computerMove() {
-  if (!playerTurn) {
+    playerTurn = false;
       // CURRENT LOGIC IS EASY MODE (RANDOM)
       
       
@@ -209,29 +218,69 @@ function computerMove() {
     // while(gameBoard[index] != undefined){
     //   //then it generates another random num
     //     index = Math.floor(Math.random() * 8)
+  switch (difficulty) {
+    case difficultyEnum.easy:
+      let boardCopy = [...gameBoard.slice()]
+      boardCopy.forEach((space, i) => {
+        boardCopy[i] = {value: space, location: i}
+      })
+      const boardCopyFilteredByEmpty = boardCopy.filter(space => space.value === "")
+      let newRandom = Math.floor(Math.random() * boardCopyFilteredByEmpty.length)
+      const location = boardCopyFilteredByEmpty[newRandom].location
+      gameBoard[location] = computerChoice
+      
+      // let randomIndex = Math.floor(Math.random() * 8);
 
-    switch (difficulty) {
-      case difficultyEnum.easy:
-        let randomIndex = Math.floor(Math.random() * 8);
+      // if (!gameBoard[randomIndex]) {
+      //   gameBoard[randomIndex] = computerChoice;
 
-        if (!gameBoard[randomIndex]) {
-          gameBoard[randomIndex] = computerChoice;
-          // TODO - mark spot in HTML side
-          if (!checkForWinner()) {
-            playerTurn = true;
+        cells[location].innerHTML = computerChoice
+        cells[location].setAttribute('disabled', true)
+
+        checkForWinner();
+        // if (!) playerTurn = true;
+      // } else {
+      //   computerMove();
+      // }
+      break;
+    case difficultyEnum.medium:
+      // Medium Difficulty - 1 Block
+      break;
+    case difficultyEnum.hard:
+      // Hard Difficulty - ALWAYS block
+      if (gameBoard.filter(v => v !== '').length > 2) {
+        for (let i = 0; i < winningCombos.length; i++) {
+          const winCondition = winningCombos[i]
+  
+          const a = gameBoard[winCondition[0]]
+          const b = gameBoard[winCondition[1]] 
+          const c = gameBoard[winCondition[2]]
+  
+          if (a !== '' && a === b) {
+              gameBoard[winCondition[2]] = computerChoice;
+              cells[winCondition[2]].innerHTML = computerChoice;
+              cells[winCondition[2]].setAttribute('disabled', true);
+              break;
           }
-        } else {
-          computerMove();
-        }
-        break;
-      case difficultyEnum.medium:
-        // Medium Difficulty - 1 Block
-        break;
-      case difficultyEnum.hard:
-        // Hard Difficulty - ALWAYS block
-        break;
-    }
 
+          if (b !== '' && b === c) {
+            gameBoard[winCondition[0]] = computerChoice;
+            cells[winCondition[0]].innerHTML = computerChoice;
+            cells[winCondition[0]].setAttribute('disabled', true);
+            break;
+          }
+
+          if (a !== '' && a === c) {
+            gameBoard[winCondition[1]] = computerChoice;
+            cells[winCondition[1]].innerHTML = computerChoice;
+            cells[winCondition[1]].setAttribute('disabled', true);
+            break;
+          }
+        }
+      } else {
+        
+      }
+      break;
   }
 }
 
@@ -240,22 +289,22 @@ function computerMove() {
 
   switch (playerMoves) {
     case 0:
-
+      gameStatus.textContent = 'Player has not made a move yet'
       break;
     case 1:
-
+      gameStatus.textContent = 'Player has made 1 move'
       break;
     case 2:
-
+      gameStatus.textContent = 'Player has made 2 moves'
       break;
     case 3:
-
+      gameStatus.textContent = 'Player has made 3 moves'
       break;
     case 4:
-
+      gameStatus.textContent = 'Player has made 4 move'
       break;
     case 5:
-
+      gameStatus.textContent = 'Player has made 5 move'
       break;
   }
 
@@ -293,8 +342,8 @@ function checkForWinner() {
         }
       }
 
-      if (roundWon) {
-        gameStatus.innerHTML = winningMessage()
+      if (gameWon) {
+        gameStatus.innerHTML = winningMessage();
         gameActive = false
         return true;
       }
