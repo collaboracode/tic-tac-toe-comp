@@ -3,6 +3,11 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    gap: 5px
+}
+
+.difficulty {
+    margin-bottom: 2rem;
 }
 
 .board {
@@ -17,4 +22,8 @@ body {
 
 .Title h1 {
     text-align: center;   /* Center the text horizontally */
+}
+
+.text-center {
+    text-align: center;
 }

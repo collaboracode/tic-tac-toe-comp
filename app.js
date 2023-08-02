@@ -248,41 +248,179 @@ function computerMove() {
       break;
     case difficultyEnum.hard:
       // Hard Difficulty - ALWAYS block
-      if (gameBoard.filter(v => v !== '').length > 2) {
-        for (let i = 0; i < winningCombos.length; i++) {
-          const winCondition = winningCombos[i]
+      // if (gameBoard.filter(v => v !== '').length > 2) {
+      //   for (let i = 0; i < winningCombos.length; i++) {
+      //     const winCondition = winningCombos[i]
   
-          const a = gameBoard[winCondition[0]]
-          const b = gameBoard[winCondition[1]] 
-          const c = gameBoard[winCondition[2]]
+      //     const a = gameBoard[winCondition[0]]
+      //     const b = gameBoard[winCondition[1]]
+      //     const c = gameBoard[winCondition[2]]
   
-          if (a !== '' && a === b) {
-              gameBoard[winCondition[2]] = computerChoice;
-              cells[winCondition[2]].innerHTML = computerChoice;
-              cells[winCondition[2]].setAttribute('disabled', true);
-              break;
-          }
+      //     if (a !== '' && a === b) {
+      //         gameBoard[winCondition[2]] = computerChoice;
+      //         cells[winCondition[2]].innerHTML = computerChoice;
+      //         cells[winCondition[2]].setAttribute('disabled', true);
+      //         break;
+      //     }
 
-          if (b !== '' && b === c) {
-            gameBoard[winCondition[0]] = computerChoice;
-            cells[winCondition[0]].innerHTML = computerChoice;
-            cells[winCondition[0]].setAttribute('disabled', true);
-            break;
-          }
+      //     if (b !== '' && b === c) {
+      //       gameBoard[winCondition[0]] = computerChoice;
+      //       cells[winCondition[0]].innerHTML = computerChoice;
+      //       cells[winCondition[0]].setAttribute('disabled', true);
+      //       break;
+      //     }
 
-          if (a !== '' && a === c) {
-            gameBoard[winCondition[1]] = computerChoice;
-            cells[winCondition[1]].innerHTML = computerChoice;
-            cells[winCondition[1]].setAttribute('disabled', true);
-            break;
-          }
-        }
-      } else {
+      //     if (a !== '' && a === c) {
+      //       gameBoard[winCondition[1]] = computerChoice;
+      //       cells[winCondition[1]].innerHTML = computerChoice;
+      //       cells[winCondition[1]].setAttribute('disabled', true);
+      //       break;
+      //     }
+      //   }
+      // } else {
         
-      }
+      // }
+      blockOrWin();
+      // const moveCount = gameBoard.filter(v => v !== '').length;
+      // console.log(moveCount)
+      // switch (moveCount) {
+      //   case 1:
+
+      //     break;
+      //   case 3:
+      //     blockOrWin();
+      //     break;
+      //   case 5:
+      //     blockOrWin();
+      //     break;
+      //   case 7:
+      //     blockOrWin();
+      //     break;
+      // }
       break;
   }
 }
+
+//////////////////////////////////////////////////////////// newest addition bellow
+
+const  blockOrWin = () => {
+  for (let i = 0; i < winningCombos.length; i++) {
+    const winCondition = winningCombos[i]
+
+    const a = gameBoard[winCondition[0]];
+    const b = gameBoard[winCondition[1]];
+    const c = gameBoard[winCondition[2]];
+
+    if (a && b && !c) {
+      if (a === b) {
+        gameBoard[winCondition[2]] = computerChoice;
+
+        if (a === playerChoice) {
+          // BLOCK 
+          let roundDraw = !gameBoard.includes('');
+
+          if (roundDraw) {
+            gameStatus.innerHTML = drawMessage
+            gameActive = false
+            return true;
+          } else {
+            return false;
+          }
+        }
+  
+        if (a === computerChoice) {
+          // WIN
+          gameStatus.innerHTML = winningMessage();
+          gameActive = false
+          return true;
+        }        
+      } else {
+        // Leave blank for now
+      }
+    }
+  }
+}
+
+function blockPlayerWin() {
+  for (let i = 0; i < winningCombos.length; i++) {
+    const winCondition = winningCombos[i]
+
+    const a = gameBoard[winCondition[0]];
+    const b = gameBoard[winCondition[1]];
+    const c = gameBoard[winCondition[2]];
+
+    // block player if they are about to win
+    if (
+      (a === playerChoice && b === playerChoice && !c) ||
+      (b === playerChoice && c === playerChoice && !a) ||
+      (a === playerChoice && c === playerChoice && !b)
+    ) {
+      if (a !== computerChoice && a !== playerChoice) {
+        gameBoard[winCondition[0]] = computerChoice;
+      } else if (b !== computerChoice && b !== playerChoice) {
+        gameBoard[winCondition[1]] = computerChoice;
+      } else if (c !== computerChoice && c !== playerChoice) {
+        gameBoard[winCondition[2]] = computerChoice;
+      }
+
+      renderBoard();
+      if (!checkForWinner()) {
+        playerTurn = true;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+function findWinningMove() {
+  for (let i = 0; i < winningCombos.length; i++) {
+    const winCondition = winningCombos[i]
+    
+    const a = gameBoard[winCondition[0]];
+    const b = gameBoard[winCondition[1]];
+    const c = gameBoard[winCondition[2]];
+
+    // check if computer has oportunity to win
+    if (
+      (a === computerChoice && b === computerChoice && !c) ||
+      (b === computerChoice && c === computerChoice && !a) ||
+      (a === computerChoice && c === computerChoice && !b)
+    ) {
+      if (a !== computerChoice && a !== playerChoice) {
+        gameBoard[winCondition[0]] = computerChoice;
+      } else if (b !== computerChoice && b !== playerChoice) {
+        gameBoard[winCondition[1]] = computerChoice;
+      } else if (c !== computerChoice && c !== playerChoice) {
+        gameBoard[winCondition[2]] = computerChoice;
+      }
+
+      renderBoard();
+      if (!checkForWinner()) {
+        playerTurn = true;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+function makeRandomMove() {
+  // make a random move
+  let randomIndex = Math.floor(Math.random() * 9);
+
+  if (!gameBoard[randomIndex]) {
+    gameBoard[randomIndex] = computerChoice;
+    renderBoard();
+    if (!checkForWinner()) {
+      playerTurn = true;
+    }
+  } else {
+    makeRandomMove();
+  }
+}
+
+///////////////////////////////////////////////////// newest addition above
 
   // TODO - Add a switch statement to see how many moves Player has on board
   const playerMoves = gameBoard.filter(v => v === playerChoice).length;
